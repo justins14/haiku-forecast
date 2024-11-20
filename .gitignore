@@ -1,0 +1,16 @@
+# Frontend
+frontend/node_modules/
+frontend/.svelte-kit/
+frontend/build/
+
+# Backend
+backend/__pycache__/
+backend/*.py[cod]
+backend/venv/
+backend/.env
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+.DS_Store 
