@@ -27,3 +27,7 @@ uvicorn app.main:app --reload --port 8000
 ```
 
 Backend will be available at http://localhost:8000 
+
+
+Uses OpenStreetMap Nominatim API for geocoding and weather data from the Open-Meteo API.
+Haikus generated primarily by ChatGPT with some modifications.

@@ -193,8 +193,11 @@ async def get_haikus(
     today_conditions = weather_service.weather_to_tags(today_forecast)
     tomorrow_conditions = weather_service.weather_to_tags(tomorrow_forecast)
     
-    today_haiku = haiku_selector.select_haiku(today_conditions)
-    tomorrow_haiku = haiku_selector.select_haiku(tomorrow_conditions)
+    # Select different haikus for today and tomorrow
+    today_haiku, tomorrow_haiku = haiku_selector.select_haikus_for_both_days(
+        today_conditions, 
+        tomorrow_conditions
+    )
     
     result = {
         "today": {
