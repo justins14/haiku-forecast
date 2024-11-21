@@ -317,7 +317,7 @@
                 </p>
                 <span class="bullet" aria-hidden="true">&bull;</span>
                 <p class="coffee">
-                    <a href="#" 
+                    <a href="https://ko-fi.com/justinsteele1499" 
                        class="subtle-link" 
                        target="_blank" 
                        rel="noopener noreferrer">support the developer</a>

@@ -39,51 +39,87 @@ class HaikuSelector:
         # Select today's haiku first
         today_haiku = random.choice(today_best)
         
-        # Remove today's haiku from tomorrow's options if possible
-        if today_haiku in tomorrow_best and len(tomorrow_best) > 1:
-            tomorrow_best.remove(today_haiku)
+        # Create a new list for tomorrow's options, excluding today's haiku
+        tomorrow_options = [haiku for haiku in tomorrow_best if haiku["text"] != today_haiku["text"]]
         
-        # Select tomorrow's haiku
-        tomorrow_haiku = random.choice(tomorrow_best)
+        # If we removed all options, use the original list
+        if not tomorrow_options:
+            print("Warning: No unique options for tomorrow, using different haiku with same score")
+            tomorrow_options = [haiku for haiku in tomorrow_best if haiku is not today_haiku]
         
+        # If still no options (very rare), use next best score
+        if not tomorrow_options:
+            print("Warning: Falling back to next best score for tomorrow")
+            next_best_score = max(score for score, haiku in tomorrow_matches 
+                                if haiku is not today_haiku and score < tomorrow_max_score)
+            tomorrow_options = [haiku for score, haiku in tomorrow_matches 
+                              if score == next_best_score and haiku is not today_haiku]
+        
+        # Select tomorrow's haiku from the filtered options
+        tomorrow_haiku = random.choice(tomorrow_options)
+        
+        print(f"Selected haikus: Today='{today_haiku['text'][0]}', Tomorrow='{tomorrow_haiku['text'][0]}'")
         return today_haiku, tomorrow_haiku
 
     def _get_scored_haikus(self, conditions: Dict[str, List[str]]) -> List[Tuple[int, Dict]]:
         """Helper method to get and score matching haikus"""
-        # Collect all time-specific tags
-        specific_tags = (
-            conditions["morning"] +
-            conditions["afternoon"] +
-            conditions["evening"]
-        )
+        print(f"Scoring haikus for conditions: {conditions}")
         
-        # Add seasonal tags from general conditions
-        seasonal_tags = [tag for tag in conditions["general"] 
-                        if tag in {"spring", "summer", "autumn", "winter"}]
-        specific_tags.extend(seasonal_tags)
+        morning_tags = set(conditions["morning"])
+        afternoon_tags = set(conditions["afternoon"])
+        evening_tags = set(conditions["evening"])
+        general_tags = set(conditions["general"])
         
-        # Get general weather tags (non-seasonal)
-        general_tags = [tag for tag in conditions["general"] 
-                       if tag not in {"spring", "summer", "autumn", "winter"}]
+        # Get primary weather conditions
+        weather_types = {
+            'clear', 'partly-cloudy', 'overcast', 'foggy', 'misty',
+            'drizzle', 'rainy', 'stormy', 'snowy', 'hail'
+        }
+        forecast_weather = set()
+        for tags in [morning_tags, afternoon_tags, evening_tags, general_tags]:
+            for tag in tags:
+                base_condition = tag.split('-')[0] if '-' in tag else tag
+                if base_condition in weather_types:
+                    forecast_weather.add(base_condition)
         
-        # Get all potential matching haikus
-        all_matching_haikus = self.haiku_manager.get_haikus_by_tags(specific_tags + general_tags)
-        
-        # Score each haiku based on matches
         scored_haikus = []
-        for haiku in all_matching_haikus:
+        for haiku in self.haiku_manager.haikus.values():
             haiku_tags = set(haiku["tags"])
+            score = 0
+            disqualified = False
             
-            # Count specific matches (time-based and seasonal)
-            specific_matches = len([tag for tag in specific_tags if tag in haiku_tags])
+            # Check for season mismatch
+            haiku_season = next((tag for tag in haiku_tags if tag in {"spring", "summer", "autumn", "winter"}), None)
+            if haiku_season and haiku_season not in general_tags:
+                continue
             
-            # Count general matches
-            general_matches = len([tag for tag in general_tags if tag in haiku_tags])
+            # Check for weather condition mismatches
+            haiku_weather = set()
+            for tag in haiku_tags:
+                base_condition = tag.split('-')[0] if '-' in tag else tag
+                if base_condition in weather_types:
+                    haiku_weather.add(base_condition)
             
-            # Score calculation: specific matches are weighted more heavily
-            score = (specific_matches * 2) + general_matches
+            # Disqualify if haiku mentions weather not in forecast
+            if haiku_weather - forecast_weather:
+                continue
             
-            scored_haikus.append((score, haiku))
+            # Score matches
+            for tag in haiku_tags:
+                if '-' in tag:
+                    period = tag.split('-')[1]
+                    if (period == 'morning' and tag in morning_tags or
+                        period == 'afternoon' and tag in afternoon_tags or
+                        period == 'evening' and tag in evening_tags):
+                        score += 3
+                elif tag in general_tags:
+                    score += 2
+                    if tag in {"spring", "summer", "autumn", "winter"}:
+                        score += 1  # Extra point for season match
+            
+            if score > 0:
+                print(f"Haiku scored {score}: {haiku['text'][0]}, tags: {haiku_tags}")
+                scored_haikus.append((score, haiku))
         
         return scored_haikus
 

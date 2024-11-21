@@ -247,6 +247,43 @@ async def get_haikus(
     
     return result
 
+@app.get("/api/weather-test")
+async def test_weather(location: str = "New York", day: str = "today"):
+    """
+    Test endpoint to check weather service functionality.
+    """
+    forecast = await weather_service.get_weather_for_location(location, day)
+    if not forecast:
+        raise HTTPException(status_code=404, detail="Location not found or weather data unavailable")
+    
+    # Convert to tags
+    conditions = weather_service.weather_to_tags(forecast)
+    
+    # Return all the data for inspection
+    return {
+        "raw_weather": {
+            "morning": {
+                "temperature": forecast.morning.temperature,
+                "weather_code": forecast.morning.weather_code,
+                "is_day": forecast.morning.is_day,
+                "time": forecast.morning.time.isoformat()
+            },
+            "afternoon": {
+                "temperature": forecast.afternoon.temperature,
+                "weather_code": forecast.afternoon.weather_code,
+                "is_day": forecast.afternoon.is_day,
+                "time": forecast.afternoon.time.isoformat()
+            },
+            "evening": {
+                "temperature": forecast.evening.temperature,
+                "weather_code": forecast.evening.weather_code,
+                "is_day": forecast.evening.is_day,
+                "time": forecast.evening.time.isoformat()
+            }
+        },
+        "conditions": conditions
+    }
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000) 
