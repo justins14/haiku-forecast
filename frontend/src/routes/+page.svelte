@@ -317,7 +317,7 @@
                 </p>
                 <span class="bullet" aria-hidden="true">&bull;</span>
                 <p class="coffee">
-                    <a href="https://ko-fi.com/justinsteele1499" 
+                    <a href="https://buymeacoffee.com/justinsteele" 
                        class="subtle-link" 
                        target="_blank" 
                        rel="noopener noreferrer">support the developer</a>
@@ -339,11 +339,6 @@
                    class="subtle-link" 
                    target="_blank" 
                    rel="noopener noreferrer">Cursor</a>
-                <span class="bullet" aria-hidden="true">&bull;</span>
-                <a href="https://vercel.com/" 
-                   class="subtle-link" 
-                   target="_blank" 
-                   rel="noopener noreferrer">Vercel</a>
                 <span class="bullet" aria-hidden="true">&bull;</span>
                 <a href="https://svelte.dev/" 
                    class="subtle-link" 
