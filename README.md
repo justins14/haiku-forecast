@@ -1,10 +1,10 @@
 # Haiku Forecast
 
-A weather application that displays the forecast as haikus.
+A hobby project weather application that displays the forecast as haikus.
 
 ## Development
 
-This project uses a SvelteKit frontend and FastAPI backend.
+This project uses a SvelteKit frontend and FastAPI backend. It was built mostly using Cursor AI as a test to see what it is capable of.
 
 ### Frontend
 
@@ -30,4 +30,4 @@ Backend will be available at http://localhost:8000
 
 
 Uses OpenStreetMap Nominatim API for geocoding and weather data from the Open-Meteo API.
-Haikus generated primarily by ChatGPT with some modifications.
+Haikus were generated primarily by ChatGPT with some modifications.
